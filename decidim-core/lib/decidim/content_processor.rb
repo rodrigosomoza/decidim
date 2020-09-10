@@ -85,14 +85,18 @@ module Decidim
     # the processed content ready to display.
     #
     # @return [String] the content processed and ready to display (it is expected to include HTML)
-    def self.render(content, wrapper_tag = "p")
+    def self.render(content, wrapper_tag = "p", options = {})
       simple_format(
-        Decidim.content_processors.reduce(content) do |result, type|
-          renderer_klass(type).constantize.new(result).render
-        end,
+        render_without_format(content, options),
         {},
         wrapper_tag: wrapper_tag
       )
+    end
+
+    def self.render_without_format(content, options = {})
+      Decidim.content_processors.reduce(content) do |result, type|
+        renderer_klass(type).constantize.new(result).render(options)
+      end
     end
 
     # This method overwrites the views `sanitize` method. This is required to
